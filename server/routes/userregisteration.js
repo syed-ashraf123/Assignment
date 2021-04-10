@@ -5,6 +5,7 @@ const User = require("../models/User");
 const { userValidation } = require("../validation/userValidation");
 const bcrypt = require("bcryptjs");
 const fs = require("fs");
+var Jimp = require("jimp");
 
 router.post(
   "/",
@@ -54,6 +55,23 @@ router.post(
       image: date,
     }).save();
 
+    var fileName = __dirname + "/uploads/" + date + ".png";
+    var imageCaption = "Mansainfotech";
+    var loadedImage;
+
+    Jimp.read(fileName)
+      .then(function (image) {
+        loadedImage = image;
+        return Jimp.loadFont(Jimp.FONT_SANS_16_BLACK);
+      })
+      .then(function (font) {
+        loadedImage
+          .print(font, 10, 10, imageCaption)
+          .write(__dirname + "/uploads/" + date + ".png");
+      })
+      .catch(function (err) {
+        console.error(err);
+      });
     res.status(200).send({ Success: "Posted" });
   }
 );
